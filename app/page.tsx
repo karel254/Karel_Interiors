@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Moon, Sun, Menu, X, Phone, Mail, MapPin, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -90,30 +90,43 @@ const PortfolioCard = ({ category, images, index }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      viewport={{ once: true }}
-      className="w-full"
+      initial={{ opacity: 0, y: 50, rotateX: -10 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
+      className="w-full transform-gpu"
+      whileHover={{ 
+        y: -5,
+        rotateY: 2,
+        transition: { duration: 0.3 }
+      }}
     >
-      <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 glow-card-hover group transform-gpu hover:scale-105 card-3d w-full">
+      <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 glow-card-hover group transform-gpu hover:scale-105 card-3d w-full perspective-1000">
         <div className="relative h-80 overflow-hidden w-full">
-          {images.map((src, imgIndex) => (
-            <div
-              key={src}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                imgIndex === currentImageIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
-              }`}
-            >
-              <Image
-                src={src || "/placeholder.svg"}
-                alt={`${category} ${imgIndex + 1}`}
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-1000"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              />
-            </div>
-          ))}
+          <AnimatePresence mode="wait">
+            {images.map((src, imgIndex) => (
+              <motion.div
+                key={src}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ 
+                  opacity: imgIndex === currentImageIndex ? 1 : 0,
+                  scale: imgIndex === currentImageIndex ? 1 : 1.1
+                }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                transition={{ duration: 1.0, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={src || "/placeholder.svg"}
+                  alt={`${category} ${imgIndex + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-1000 transform-gpu"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  loading="eager"
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
         <CardContent className="p-6 w-full">
@@ -146,8 +159,35 @@ export default function KarelInteriorDesigns() {
   const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+    
+    // Handle initial dark mode
+    if (typeof window !== 'undefined') {
+      const isDark = document.documentElement.classList.contains('dark')
+      setDarkMode(isDark)
+    }
+    
+    // Instant preload all images in background
+    const preloadAllImages = () => {
+      // Preload hero images
+      heroImages.forEach((src) => {
+        const img = new window.Image()
+        img.src = src
+      })
+      
+      // Preload portfolio images
+      Object.values(portfolioCategories).flat().forEach((src) => {
+        const img = new window.Image()
+        img.src = src
+      })
+    }
+    
+    // Start preloading immediately
+    preloadAllImages()
+    
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)
     }, 6000)
@@ -156,7 +196,9 @@ export default function KarelInteriorDesigns() {
 
   const toggleDarkMode = useCallback(() => {
     setDarkMode(!darkMode)
-    document.documentElement.classList.toggle("dark")
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle("dark")
+    }
   }, [darkMode])
 
   const scrollToSection = useCallback(
@@ -165,17 +207,19 @@ export default function KarelInteriorDesigns() {
 
       setTimeout(
         () => {
-          const element = document.getElementById(sectionId)
-          if (element) {
-            const navbar = document.querySelector("nav")
-            const navbarHeight = navbar ? navbar.offsetHeight : 80
-            const elementPosition = element.offsetTop
-            const offsetPosition = elementPosition - navbarHeight + 4
+          if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+            const element = document.getElementById(sectionId)
+            if (element) {
+              const navbar = document.querySelector("nav")
+              const navbarHeight = navbar ? navbar.offsetHeight : 80
+              const elementPosition = element.offsetTop
+              const offsetPosition = elementPosition - navbarHeight + 4
 
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: "smooth",
-            })
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth",
+              })
+            }
           }
         },
         mobileMenuOpen ? 150 : 0,
@@ -186,8 +230,9 @@ export default function KarelInteriorDesigns() {
 
   return (
     <div
-      className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 ${darkMode ? "dark bg-slate-900" : "bg-white"}`}
+      className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 transform-gpu ${darkMode ? "dark bg-slate-900" : "bg-white"}`}
     >
+
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
@@ -279,32 +324,45 @@ export default function KarelInteriorDesigns() {
       >
         {/* Background Slideshow */}
         <div className="absolute inset-0 w-full h-full">
-          {heroImages.map((src, index) => (
-            <div
-              key={src}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1500 ease-in-out ${
-                index === (currentHeroIndex % heroImages.length) ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <Image
-                src={src || "/placeholder.svg"}
-                alt={`Hero Interior Design ${index + 1}`}
-                fill
-                className="object-cover w-full h-full"
-                priority={index === 0}
-                sizes="100vw"
-              />
-            </div>
-          ))}
+          <AnimatePresence mode="wait">
+            {heroImages.map((src, index) => (
+              <motion.div
+                key={src}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ 
+                  opacity: index === (currentHeroIndex % heroImages.length) ? 1 : 0,
+                  scale: index === (currentHeroIndex % heroImages.length) ? 1 : 1.1
+                }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full"
+              >
+                <Image
+                  src={src || "/placeholder.svg"}
+                  alt={`Hero Interior Design ${index + 1}`}
+                  fill
+                  className="object-cover w-full h-full transform-gpu"
+                  priority={index === 0}
+                  sizes="100vw"
+                  loading="eager"
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent w-full h-full" />
 
         <div className="relative z-10 text-center text-white px-4 sm:px-6 w-full max-w-4xl mx-auto">
           <motion.h1
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
+            initial={{ y: 50, opacity: 0, rotateX: -15 }}
+            animate={{ y: 0, opacity: 1, rotateX: 0 }}
+            transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight transform-gpu perspective-1000"
+            whileHover={{ 
+              scale: 1.02,
+              rotateY: 2,
+              transition: { duration: 0.3 }
+            }}
           >
             Karel Interior
             <span className="block bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent glow-text">
@@ -313,25 +371,30 @@ export default function KarelInteriorDesigns() {
           </motion.h1>
 
           <motion.p
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200"
+            initial={{ y: 30, opacity: 0, rotateX: -10 }}
+            animate={{ y: 0, opacity: 1, rotateX: 0 }}
+            transition={{ delay: 0.4, duration: 1.0, ease: "easeOut" }}
+            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200 transform-gpu"
           >
             "Where Imagination Becomes a Masterpiece" 🎨
           </motion.p>
 
           <motion.div
-            initial={{ y: 30, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            whileHover={{ scale: 1.05 }}
+            initial={{ y: 30, opacity: 0, scale: 0.9, rotateX: -5 }}
+            animate={{ y: 0, opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ delay: 0.6, duration: 1.0, ease: "easeOut" }}
+            whileHover={{ 
+              scale: 1.05,
+              rotateY: 3,
+              transition: { duration: 0.3 }
+            }}
             whileTap={{ scale: 0.95 }}
+            className="transform-gpu"
           >
             <Button
               onClick={() => scrollToSection("contact")}
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 glow-button"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 glow-button transform-gpu"
             >
               Book a Consultation
             </Button>
