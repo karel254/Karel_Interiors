@@ -1,0 +1,401 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body {
+    position: relative;
+    width: 100%;
+  }
+}
+
+/* Prevent horizontal scroll */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+/* Container constraints */
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* Custom Glow Effects */
+.glow-text {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.glow-button {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-button:hover {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+.glow-card {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.glow-card-hover:hover {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-5px);
+}
+
+.glow-line {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.glow-dot {
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.glow-icon {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.glow-input {
+  transition: all 0.3s ease;
+}
+
+.glow-input:focus {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Dark mode glow effects */
+.dark .glow-text {
+  text-shadow: 0 0 25px rgba(147, 197, 253, 0.6);
+}
+
+.dark .glow-button {
+  box-shadow: 0 0 25px rgba(147, 197, 253, 0.4);
+}
+
+.dark .glow-button:hover {
+  box-shadow: 0 0 35px rgba(147, 197, 253, 0.6);
+}
+
+.dark .glow-card {
+  box-shadow: 0 4px 25px rgba(147, 197, 253, 0.15);
+  border: 1px solid rgba(147, 197, 253, 0.2);
+}
+
+.dark .glow-card-hover:hover {
+  box-shadow: 0 8px 45px rgba(147, 197, 253, 0.25);
+  border-color: rgba(147, 197, 253, 0.4);
+}
+
+.dark .glow-line {
+  box-shadow: 0 0 15px rgba(147, 197, 253, 0.6);
+}
+
+.dark .glow-dot {
+  box-shadow: 0 0 10px rgba(147, 197, 253, 0.7);
+}
+
+.dark .glow-icon {
+  box-shadow: 0 0 20px rgba(147, 197, 253, 0.3);
+}
+
+.dark .glow-input:focus {
+  box-shadow: 0 0 20px rgba(147, 197, 253, 0.4);
+  border-color: rgba(147, 197, 253, 0.6);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #2563eb, #1e40af);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #93c5fd, #60a5fa);
+}
+
+/* 3D Effects and Smooth Animations */
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.translate-z-4 {
+  transform: translateZ(4px);
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(20px);
+}
+
+.glow-button-3d {
+  transform-style: preserve-3d;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glow-button-3d:hover {
+  transform: perspective(1000px) rotateX(-5deg) translateY(-2px) translateZ(10px);
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+}
+
+.glow-button-3d:active {
+  transform: perspective(1000px) rotateX(-2deg) translateY(-1px) translateZ(5px);
+}
+
+/* Smoother transitions for all interactive elements */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 3D Navigation effects */
+nav {
+  transform: translateZ(0);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Enhanced glow effects with 3D depth */
+.glow-card-hover:hover {
+  box-shadow: 0 8px 40px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0
+    rgba(255, 255, 255, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-5px) perspective(1000px) rotateX(2deg);
+}
+
+.dark .glow-card-hover:hover {
+  box-shadow: 0 8px 45px rgba(147, 197, 253, 0.25), 0 2px 10px rgba(147, 197, 253, 0.15), inset 0 1px 0
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(147, 197, 253, 0.4);
+}
+
+/* Smooth scale utilities */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.hover\:rotate-x-2:hover {
+  transform: perspective(1000px) rotateX(2deg);
+}
+
+.hover\:rotate-x-5:hover {
+  transform: perspective(1000px) rotateX(5deg);
+}
+
+.hover\:-rotate-y-5:hover {
+  transform: perspective(1000px) rotateY(-5deg);
+}
+
+/* Enhanced input focus effects */
+.glow-input:focus {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), 0 0 5px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateZ(2px);
+}
+
+.dark .glow-input:focus {
+  box-shadow: 0 0 20px rgba(147, 197, 253, 0.4), 0 0 8px rgba(147, 197, 253, 0.3), inset 0 1px 0
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(147, 197, 253, 0.6);
+}
+
+/* Smooth image transitions */
+img {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Enhanced mobile responsiveness for 3D effects */
+@media (max-width: 768px) {
+  .card-3d:hover {
+    transform: perspective(1000px) rotateX(2deg) translateZ(10px);
+  }
+
+  .glow-button-3d:hover {
+    transform: perspective(1000px) rotateX(-2deg) translateY(-1px) translateZ(5px);
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .card-3d:hover,
+  .glow-button-3d:hover,
+  .hover\:scale-102:hover,
+  .hover\:scale-105:hover,
+  .hover\:rotate-x-2:hover,
+  .hover\:rotate-x-5:hover,
+  .hover\:-rotate-y-5:hover {
+    transform: none;
+  }
+}
+
+/* Ensure no horizontal overflow */
+section {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Grid responsiveness */
+.grid {
+  width: 100%;
+}
+
+/* Text responsiveness */
+@media (max-width: 640px) {
+  .text-5xl {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .text-7xl {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+}
