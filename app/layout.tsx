@@ -19,12 +19,6 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/images/karel-logo.png" type="image/png" />
-        <link rel="preload" href="/images/karel-logo.png" as="image" />
-        <link rel="preload" href="/images/living-room-1.jpg" as="image" />
-        <link rel="preload" href="/images/living-room-2.jpg" as="image" />
-        <link rel="preload" href="/images/living-room-3.jpg" as="image" />
-        <link rel="preload" href="/images/living-room-4.jpg" as="image" />
-        <link rel="preload" href="/images/living-room-5.jpg" as="image" />
       </head>
       <body className={GeistSans.className}>{children}</body>
     </html>

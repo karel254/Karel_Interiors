@@ -122,7 +122,9 @@ const PortfolioCard = ({ category, images, index }) => {
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-1000 transform-gpu"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  loading="eager"
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                 />
               </motion.div>
             ))}
@@ -159,34 +161,13 @@ export default function KarelInteriorDesigns() {
   const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0)
-  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
-    
     // Handle initial dark mode
     if (typeof window !== 'undefined') {
       const isDark = document.documentElement.classList.contains('dark')
       setDarkMode(isDark)
     }
-    
-    // Instant preload all images in background
-    const preloadAllImages = () => {
-      // Preload hero images
-      heroImages.forEach((src) => {
-        const img = new window.Image()
-        img.src = src
-      })
-      
-      // Preload portfolio images
-      Object.values(portfolioCategories).flat().forEach((src) => {
-        const img = new window.Image()
-        img.src = src
-      })
-    }
-    
-    // Start preloading immediately
-    preloadAllImages()
     
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)
@@ -230,14 +211,15 @@ export default function KarelInteriorDesigns() {
 
   return (
     <div
-      className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 transform-gpu ${darkMode ? "dark bg-slate-900" : "bg-white"}`}
+      className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 ${darkMode ? "dark bg-slate-900" : "bg-white"}`}
     >
 
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 w-full z-50 backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20"
+        className="fixed top-0 left-0 right-0 w-full z-[9999] backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg"
+        style={{ position: 'fixed' }}
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between w-full">
@@ -344,7 +326,9 @@ export default function KarelInteriorDesigns() {
                   className="object-cover w-full h-full transform-gpu"
                   priority={index === 0}
                   sizes="100vw"
-                  loading="eager"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                 />
               </motion.div>
             ))}
