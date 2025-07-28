@@ -16,7 +16,7 @@ const isBrowser = typeof window !== 'undefined'
 if (isBrowser) {
   // Object.assign polyfill for IE
   if (typeof Object.assign !== 'function') {
-    Object.assign = function(target, ...sources) {
+    Object.assign = function(target: any, ...sources: any[]): any {
       if (target == null) {
         throw new TypeError('Cannot convert undefined or null to object');
       }
@@ -37,7 +37,7 @@ if (isBrowser) {
 
   // Array.from polyfill for IE
   if (!Array.from) {
-    Array.from = function (object) {
+    Array.from = function (object: any): any[] {
       return [].slice.call(object);
     };
   }
@@ -60,7 +60,7 @@ if (isBrowser) {
 }
 
 // Cross-browser event handling
-const addEventListenerCompat = (element, event, handler, options) => {
+const addEventListenerCompat = (element: any, event: string, handler: any, options?: any) => {
   if (element.addEventListener) {
     element.addEventListener(event, handler, options || false);
   } else if (element.attachEvent) {
@@ -70,7 +70,7 @@ const addEventListenerCompat = (element, event, handler, options) => {
   }
 };
 
-const removeEventListenerCompat = (element, event, handler, options) => {
+const removeEventListenerCompat = (element: any, event: string, handler: any, options?: any) => {
   if (element.removeEventListener) {
     element.removeEventListener(event, handler, options || false);
   } else if (element.detachEvent) {
@@ -81,7 +81,7 @@ const removeEventListenerCompat = (element, event, handler, options) => {
 };
 
 // Cross-browser window.open with fallbacks
-const openWindowCompat = (url, target = '_blank') => {
+const openWindowCompat = (url: string, target: string = '_blank') => {
   try {
     // Modern browsers
     if (window.open) {
@@ -102,7 +102,7 @@ const openWindowCompat = (url, target = '_blank') => {
 };
 
 // Cross-browser smooth scroll polyfill
-const smoothScrollTo = (element, options = {}) => {
+const smoothScrollTo = (element: any, options: any = {}) => {
   if (!element) return;
   
   // Modern browsers with smooth scroll support
@@ -119,9 +119,9 @@ const smoothScrollTo = (element, options = {}) => {
     const target = element.offsetTop - (options.offset || 80);
     const distance = target - start;
     const duration = options.duration || 1000;
-    let startTime = null;
+    let startTime: number | null = null;
 
-    const animateScroll = (currentTime) => {
+    const animateScroll = (currentTime: number) => {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
@@ -132,11 +132,18 @@ const smoothScrollTo = (element, options = {}) => {
       window.scrollTo(0, start + distance * ease);
       
       if (timeElapsed < duration) {
-        requestAnimationFrame(animateScroll);
+        if (window.requestAnimationFrame && typeof window.requestAnimationFrame === 'function') {
+          requestAnimationFrame(animateScroll);
+        } else {
+          // Fallback for very old browsers
+          setTimeout(() => {
+            window.scrollTo(0, target);
+          }, 100);
+        }
       }
     };
 
-    if (window.requestAnimationFrame) {
+    if (window.requestAnimationFrame && typeof window.requestAnimationFrame === 'function') {
       requestAnimationFrame(animateScroll);
     } else {
       // Fallback for very old browsers
@@ -147,27 +154,8 @@ const smoothScrollTo = (element, options = {}) => {
   }
 };
 
-// Device detection with comprehensive checks
-const getDeviceInfo = () => {
-  if (!isBrowser) return { isMobile: false, isTablet: false, isDesktop: true };
-  
-  const userAgent = navigator.userAgent.toLowerCase();
-  const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-  
-  const isMobile = width < 768 || 
-    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) ||
-    ('ontouchstart' in window) ||
-    (navigator.maxTouchPoints > 0) ||
-    (navigator.msMaxTouchPoints > 0);
-  
-  const isTablet = width >= 768 && width < 1024 && isMobile;
-  const isDesktop = !isMobile && !isTablet;
-  
-  return { isMobile, isTablet, isDesktop };
-};
-
 // Enhanced WhatsApp URL generation with encoding fallbacks
-const generateWhatsAppURL = (phone, message) => {
+const generateWhatsAppURL = (phone: string, message: string): string => {
   try {
     // Modern browsers
     if (encodeURIComponent) {
@@ -234,21 +222,61 @@ const testimonials = [
   },
 ]
 
+// Device detection with comprehensive checks
+const getDeviceInfo = () => {
+  if (!isBrowser) return { isBrowser: true, isMobile: false, isTablet: false, isDesktop: true };
+  
+  const userAgent = navigator.userAgent.toLowerCase();
+  const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  
+  // Type assertion for msMaxTouchPoints which exists on IE/Edge
+  interface NavigatorWithMSTouch extends Navigator {
+    msMaxTouchPoints?: number;
+  }
+  
+  const navWithTouch = navigator as NavigatorWithMSTouch;
+  
+  const isMobile = width < 768 || 
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) ||
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    (navWithTouch.msMaxTouchPoints && navWithTouch.msMaxTouchPoints > 0);
+  
+  const isTablet = width >= 768 && width < 1024 && isMobile;
+  const isDesktop = !isMobile && !isTablet;
+  
+  return { isBrowser: true, isMobile, isTablet, isDesktop };
+};
+
+// TypeScript interfaces
+interface PortfolioCardProps {
+  category: string;
+  images: string[];
+  index: number;
+}
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 // Optimized Portfolio Card Component
-const PortfolioCard = ({ category, images, index }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0)
+  const [isHovered, setIsHovered] = useState<boolean>(false)
+  const [isMobile, setIsMobile] = useState<boolean>(false)
 
   useEffect(() => {
     // Check if device is mobile with comprehensive detection
     const checkMobile = () => {
       const deviceInfo = getDeviceInfo();
-      setIsMobile(deviceInfo.isMobile);
+      setIsMobile(!!deviceInfo.isMobile);
     }
-    
-    checkMobile()
-    
+
+    checkMobile();
     // Use cross-browser event listener
     if (isBrowser) {
       addEventListenerCompat(window, 'resize', checkMobile);
@@ -340,7 +368,7 @@ const PortfolioCard = ({ category, images, index }) => {
           <h3 className="text-xl md:text-2xl font-semibold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
             {category}
           </h3>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4">{categoryDescriptions[category]}</p>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4">{categoryDescriptions[category as keyof typeof categoryDescriptions]}</p>
           <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
             <span>{images.length} Projects</span>
             <div className="flex space-x-1">
@@ -364,45 +392,62 @@ const PortfolioCard = ({ category, images, index }) => {
 
 // Browser detection and feature support
 const getBrowserInfo = () => {
-  if (!isBrowser) return { name: 'server', version: '0', isSupported: true };
+  if (!isBrowser) return { name: 'server', version: 0, isSupported: true };
   
   const userAgent = navigator.userAgent;
   let browserName = 'unknown';
-  let browserVersion = '0';
+  let browserVersion = 0;
   let isSupported = true;
   
   // Detect browser
   if (userAgent.indexOf('Chrome') > -1) {
     browserName = 'Chrome';
-    browserVersion = userAgent.match(/Chrome\/(\d+)/)?.[1] || '0';
+    browserVersion = parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0');
   } else if (userAgent.indexOf('Firefox') > -1) {
     browserName = 'Firefox';
-    browserVersion = userAgent.match(/Firefox\/(\d+)/)?.[1] || '0';
+    browserVersion = parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0');
   } else if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) {
     browserName = 'Safari';
-    browserVersion = userAgent.match(/Version\/(\d+)/)?.[1] || '0';
+    browserVersion = parseInt(userAgent.match(/Version\/(\d+)/)?.[1] || '0');
   } else if (userAgent.indexOf('Edge') > -1) {
     browserName = 'Edge';
-    browserVersion = userAgent.match(/Edge\/(\d+)/)?.[1] || '0';
+    browserVersion = parseInt(userAgent.match(/Edge\/(\d+)/)?.[1] || '0');
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
     browserName = 'IE';
-    browserVersion = userAgent.match(/(?:MSIE |rv:)(\d+)/)?.[1] || '0';
-    isSupported = parseInt(browserVersion) >= 11; // IE 11+ support
+    browserVersion = parseInt(userAgent.match(/(?:MSIE |rv:)(\d+)/)?.[1] || '0');
+    isSupported = browserVersion >= 11; // IE 11+ support
   }
   
-  return { name: browserName, version: parseInt(browserVersion), isSupported };
+  return { name: browserName, version: browserVersion, isSupported };
 };
 
 // Feature detection
-const checkFeatureSupport = () => {
+interface FeatureSupport {
+  flexbox: boolean;
+  grid: boolean;
+  transforms: boolean;
+  animations: boolean;
+  backdropFilter: boolean;
+  webp: boolean;
+  avif: boolean;
+  intersectionObserver: boolean;
+  requestAnimationFrame: boolean;
+  localStorage: boolean;
+}
+
+const checkFeatureSupport = (): FeatureSupport | { all: boolean } => {
   if (!isBrowser) return { all: true };
   
   return {
-    flexbox: CSS.supports('display', 'flex') || CSS.supports('display', '-webkit-flex'),
-    grid: CSS.supports('display', 'grid'),
-    transforms: CSS.supports('transform', 'translateZ(0)') || CSS.supports('-webkit-transform', 'translateZ(0)'),
-    animations: CSS.supports('animation', 'none') || CSS.supports('-webkit-animation', 'none'),
-    backdropFilter: CSS.supports('backdrop-filter', 'blur(10px)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px)'),
+    flexbox: (window.CSS && window.CSS.supports && window.CSS.supports('display', 'flex')) || 
+             (window.CSS && window.CSS.supports && window.CSS.supports('display', '-webkit-flex')),
+    grid: window.CSS && window.CSS.supports && window.CSS.supports('display', 'grid'),
+    transforms: (window.CSS && window.CSS.supports && window.CSS.supports('transform', 'translateZ(0)')) || 
+                (window.CSS && window.CSS.supports && window.CSS.supports('-webkit-transform', 'translateZ(0)')),
+    animations: (window.CSS && window.CSS.supports && window.CSS.supports('animation', 'none')) || 
+                (window.CSS && window.CSS.supports && window.CSS.supports('-webkit-animation', 'none')),
+    backdropFilter: (window.CSS && window.CSS.supports && window.CSS.supports('backdrop-filter', 'blur(10px)')) || 
+                    (window.CSS && window.CSS.supports && window.CSS.supports('-webkit-backdrop-filter', 'blur(10px)')),
     webp: false, // Will be detected dynamically
     avif: false, // Will be detected dynamically
     intersectionObserver: 'IntersectionObserver' in window,
@@ -421,7 +466,7 @@ const checkFeatureSupport = () => {
 };
 
 // Error boundary for graceful degradation
-const handleError = (error, errorInfo) => {
+const handleError = (error: any, errorInfo: any) => {
   console.warn('Karel Interior Designs: Non-critical error handled gracefully:', error);
   // Could send to error reporting service
 };
@@ -432,16 +477,24 @@ if (isBrowser) {
   const features = checkFeatureSupport();
   
   // Add browser class to body for CSS targeting
-  document.body.className += ` browser-${browserInfo.name.toLowerCase()} version-${browserInfo.version}`;
-  
-  // Add feature classes
-  Object.keys(features).forEach(feature => {
-    if (features[feature]) {
-      document.body.className += ` supports-${feature}`;
+  if (document.body) {
+    document.body.className += ` browser-${browserInfo.name.toLowerCase()} version-${browserInfo.version}`;
+    
+    // Add feature classes
+    if ('all' in features) {
+      // Server-side rendering case
+      document.body.className += ' supports-all';
     } else {
-      document.body.className += ` no-${feature}`;
+      Object.keys(features).forEach((feature: string) => {
+        const featureSupported = (features as FeatureSupport)[feature as keyof FeatureSupport];
+        if (featureSupported) {
+          document.body.className += ` supports-${feature}`;
+        } else {
+          document.body.className += ` no-${feature}`;
+        }
+      });
     }
-  });
+  }
   
   // Warn about unsupported browsers
   if (!browserInfo.isSupported) {
@@ -449,12 +502,16 @@ if (isBrowser) {
   }
   
   // Detect WebP support
-  const webpTest = new Image();
+  const webpTest = document.createElement('img');
   webpTest.onload = webpTest.onerror = function() {
     if (webpTest.height === 2) {
-      document.body.className += ' supports-webp';
+      if (document.body) {
+        document.body.className += ' supports-webp';
+      }
     } else {
-      document.body.className += ' no-webp';
+      if (document.body) {
+        document.body.className += ' no-webp';
+      }
     }
   };
   webpTest.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
@@ -464,7 +521,7 @@ export default function KarelInteriorDesigns() {
   const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
     email: '',
@@ -472,7 +529,7 @@ export default function KarelInteriorDesigns() {
     message: ''
   })
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -510,7 +567,7 @@ export default function KarelInteriorDesigns() {
   }, [darkMode])
 
   const scrollToSection = useCallback(
-    (sectionId) => {
+    (sectionId: string) => {
       setMobileMenuOpen(false)
 
       setTimeout(
@@ -529,7 +586,7 @@ export default function KarelInteriorDesigns() {
     [mobileMenuOpen],
   )
 
-  const handleWhatsAppSubmit = (e) => {
+  const handleWhatsAppSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
     
