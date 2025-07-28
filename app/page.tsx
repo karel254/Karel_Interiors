@@ -250,7 +250,7 @@ export default function KarelInteriorDesigns() {
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between w-full">
-            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center flex-shrink-0">
+            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center flex-shrink-0 space-x-3">
               <Image
                 src="/images/karel-logo.png"
                 alt="Karel Interior Designs"
@@ -259,6 +259,27 @@ export default function KarelInteriorDesigns() {
                 className="h-10 sm:h-12 md:h-14 w-auto"
                 priority
               />
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="hidden sm:block"
+              >
+                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
+                  Karel Interior Designs
+                </h1>
+              </motion.div>
+              {/* Mobile version - shorter text */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="block sm:hidden"
+              >
+                <h1 className="text-sm font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
+                  Karel Designs
+                </h1>
+              </motion.div>
             </motion.div>
 
             {/* Desktop Menu */}
