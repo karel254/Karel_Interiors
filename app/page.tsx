@@ -196,6 +196,7 @@ const portfolioCategories = {
   ],
   Bedroom: ["/images/bedroom-1.jpg", "/images/bedroom-2.jpg", "/images/bedroom-3.jpg"],
   "Dining Room": ["/images/dining-room-1.jpg", "/images/dining-room-2.jpg", "/images/dining-room-3.jpg"],
+  "Accent Walls": ["/images/accent-wall.jpg"],
 }
 
 const testimonials = [
@@ -270,7 +271,6 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
   const [isMobile, setIsMobile] = useState<boolean>(false)
 
   useEffect(() => {
-    // Check if device is mobile with comprehensive detection
     const checkMobile = () => {
       const deviceInfo = getDeviceInfo();
       setIsMobile(!!deviceInfo.isMobile);
@@ -280,24 +280,38 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
     // Use cross-browser event listener
     if (isBrowser) {
       addEventListenerCompat(window, 'resize', checkMobile);
-      
       return () => removeEventListenerCompat(window, 'resize', checkMobile);
     }
   }, [])
 
   useEffect(() => {
-    if (images.length <= 1) return
-
     // Only run slideshow if mobile OR (desktop AND hovered)
     const shouldRunSlideshow = isMobile || (!isMobile && isHovered)
     
     if (!shouldRunSlideshow) return
 
+    // Network-aware timing for smooth transitions
+    const getNetworkAwareInterval = () => {
+      if (isBrowser && 'connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            return isMobile ? 7000 + index * 1000 : 3000; // Slower for very slow connections
+          } else if (connection.effectiveType === '3g') {
+            return isMobile ? 6000 + index * 900 : 2500; // Moderate for 3G
+          } else {
+            return isMobile ? 5000 + index * 800 : 2000; // Fast for 4G/5G
+          }
+        }
+      }
+      return isMobile ? 5000 + index * 800 : 2000; // Default fallback
+    };
+
     const interval = setInterval(
       () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length)
       },
-      isMobile ? 5000 + index * 800 : 2000, // Faster on desktop hover
+      getNetworkAwareInterval()
     )
 
     return () => clearInterval(interval)
@@ -309,6 +323,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
       Kitchen: "Modern kitchens that blend functionality with beautiful design",
       Bedroom: "Serene and comfortable bedrooms designed for rest and relaxation",
       "Dining Room": "Elegant dining spaces perfect for memorable gatherings",
+      "Accent Walls": "Stunning accent walls that add character and visual interest to any space",
     }),
     [],
   )
@@ -337,30 +352,44 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
       <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 glow-card-hover group transform-gpu hover:scale-105 card-3d w-full perspective-1000">
         <div className="relative h-80 overflow-hidden w-full">
           <AnimatePresence mode="wait">
-            {images.map((src, imgIndex) => (
+          {images.map((src, imgIndex) => (
               <motion.div
-                key={src}
-                initial={{ opacity: 0, scale: 1.1 }}
+              key={src}
+                initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ 
                   opacity: imgIndex === currentImageIndex ? 1 : 0,
-                  scale: imgIndex === currentImageIndex ? 1 : 1.1
+                  scale: imgIndex === currentImageIndex ? 1 : 1.05
                 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 1.0, ease: "easeInOut" }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ 
+                  duration: 0.8, 
+                  ease: [0.4, 0.0, 0.2, 1], // Custom easing for smoother transitions
+                  opacity: { duration: 0.6 },
+                  scale: { duration: 0.8 }
+                }}
                 className="absolute inset-0"
-              >
-                <Image
-                  src={src || "/placeholder.svg"}
-                  alt={`${category} ${imgIndex + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-1000 transform-gpu"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  loading="lazy"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                />
+            >
+              <Image
+                src={src || "/placeholder.svg"}
+                alt={`${category} ${imgIndex + 1}`}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-1000 transform-gpu"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                loading="lazy"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                onLoad={() => {
+                  console.log(`Successfully loaded portfolio image: ${src}`);
+                }}
+                onError={(e) => {
+                  console.warn(`Failed to load portfolio image: ${src}`);
+                  // Fallback to placeholder
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/placeholder.svg";
+                }}
+              />
               </motion.div>
-            ))}
+          ))}
           </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
@@ -515,6 +544,42 @@ if (isBrowser) {
     }
   };
   webpTest.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+  
+  // Preload critical images for better performance
+  const preloadCriticalImages = () => {
+    const criticalImages = [
+      ...heroImages,
+      ...Object.values(portfolioCategories).flat().slice(0, 3) // Preload first 3 images from each category
+    ];
+    
+    // Network-aware preloading
+    const shouldPreload = () => {
+      if (isBrowser && 'connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          // Don't preload on very slow connections to save bandwidth
+          return connection.effectiveType !== 'slow-2g' && connection.effectiveType !== '2g';
+        }
+      }
+      return true; // Default to preloading
+    };
+    
+    if (!shouldPreload()) return;
+    
+    criticalImages.forEach((src) => {
+      if (src && src !== "/placeholder.svg") {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = src;
+        link.fetchPriority = 'high';
+        document.head.appendChild(link);
+      }
+    });
+  };
+  
+  // Preload images after a short delay to not block initial render
+  setTimeout(preloadCriticalImages, 100);
 }
 
 export default function KarelInteriorDesigns() {
@@ -540,28 +605,77 @@ export default function KarelInteriorDesigns() {
   useEffect(() => {
     // Handle initial dark mode with cross-browser support
     if (isBrowser) {
-      const isDark = document.documentElement.classList.contains('dark') ||
-                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      setDarkMode(isDark);
+      // Check for saved theme preference or system preference
+      const savedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      let shouldBeDark = false;
+      
+      if (savedTheme) {
+        shouldBeDark = savedTheme === 'dark';
+      } else {
+        shouldBeDark = systemPrefersDark;
+      }
+      
+      setDarkMode(shouldBeDark);
+      
+      // Apply theme to document
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
+    
+    // Network-aware slideshow timing for smooth transitions
+    const getNetworkAwareInterval = () => {
+      if (isBrowser && 'connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          // Adjust timing based on connection speed
+          if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            return 8000; // Slower for very slow connections
+          } else if (connection.effectiveType === '3g') {
+            return 7000; // Moderate for 3G
+          } else {
+            return 6000; // Fast for 4G/5G
+          }
+        }
+      }
+      return 6000; // Default fallback
+    };
     
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)
-    }, 6000)
+    }, getNetworkAwareInterval())
     return () => clearInterval(interval)
   }, [])
 
   const toggleDarkMode = useCallback(() => {
-    setDarkMode(!darkMode)
-    if (isBrowser && document.documentElement.classList) {
-      document.documentElement.classList.toggle("dark")
-    } else if (isBrowser) {
-      // Fallback for older browsers
-      const html = document.documentElement;
-      if (html.className.indexOf('dark') !== -1) {
-        html.className = html.className.replace('dark', '');
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    if (isBrowser) {
+      // Save preference
+      localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+      
+      // Apply to document
+      if (document.documentElement.classList) {
+        if (newDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       } else {
-        html.className += ' dark';
+        // Fallback for older browsers
+        const html = document.documentElement;
+        if (newDarkMode) {
+          if (html.className.indexOf('dark') === -1) {
+            html.className += ' dark';
+          }
+        } else {
+          html.className = html.className.replace(/\bdark\b/g, '').trim();
+        }
       }
     }
   }, [darkMode])
@@ -573,8 +687,8 @@ export default function KarelInteriorDesigns() {
       setTimeout(
         () => {
           if (isBrowser) {
-            const element = document.getElementById(sectionId)
-            if (element) {
+          const element = document.getElementById(sectionId)
+          if (element) {
               // Use our cross-browser smooth scroll
               smoothScrollTo(element, { offset: 80 });
             }
@@ -673,7 +787,7 @@ I would love to discuss this project further with you.`
                 className="block sm:hidden"
               >
                 <h1 className="text-sm font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
-                  Karel Designs
+                  Karel Interior Designs
                 </h1>
               </motion.div>
             </motion.div>
@@ -751,31 +865,45 @@ I would love to discuss this project further with you.`
         {/* Background Slideshow */}
         <div className="absolute inset-0 w-full h-full">
           <AnimatePresence mode="wait">
-            {heroImages.map((src, index) => (
+          {heroImages.map((src, index) => (
               <motion.div
-                key={src}
-                initial={{ opacity: 0, scale: 1.1 }}
+              key={src}
+                initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ 
                   opacity: index === (currentHeroIndex % heroImages.length) ? 1 : 0,
-                  scale: index === (currentHeroIndex % heroImages.length) ? 1 : 1.1
+                  scale: index === (currentHeroIndex % heroImages.length) ? 1 : 1.05
                 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ 
+                  duration: 1.2, 
+                  ease: [0.4, 0.0, 0.2, 1], // Custom easing for smoother transitions
+                  opacity: { duration: 0.8 },
+                  scale: { duration: 1.2 }
+                }}
                 className="absolute inset-0 w-full h-full"
-              >
-                <Image
-                  src={src || "/placeholder.svg"}
-                  alt={`Hero Interior Design ${index + 1}`}
-                  fill
-                  className="object-cover w-full h-full transform-gpu"
-                  priority={index === 0}
-                  sizes="100vw"
-                  loading={index === 0 ? "eager" : "lazy"}
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                />
+            >
+              <Image
+                src={src || "/placeholder.svg"}
+                alt={`Hero Interior Design ${index + 1}`}
+                fill
+                className="object-cover w-full h-full transform-gpu"
+                priority={index === 0}
+                sizes="100vw"
+                loading={index === 0 ? "eager" : "lazy"}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                onLoad={() => {
+                  console.log(`Successfully loaded hero image: ${src}`);
+                }}
+                onError={(e) => {
+                  console.warn(`Failed to load hero image: ${src}`);
+                  // Fallback to placeholder
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/placeholder.svg";
+                }}
+              />
               </motion.div>
-            ))}
+          ))}
           </AnimatePresence>
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent w-full h-full" />
