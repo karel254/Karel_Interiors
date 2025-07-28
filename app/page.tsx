@@ -9,6 +9,179 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import Image from "next/image"
 
+// Browser compatibility polyfills
+const isBrowser = typeof window !== 'undefined'
+
+// Polyfill for older browsers
+if (isBrowser) {
+  // Object.assign polyfill for IE
+  if (typeof Object.assign !== 'function') {
+    Object.assign = function(target, ...sources) {
+      if (target == null) {
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+      const to = Object(target);
+      for (let index = 0; index < sources.length; index++) {
+        const nextSource = sources[index];
+        if (nextSource != null) {
+          for (const nextKey in nextSource) {
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    };
+  }
+
+  // Array.from polyfill for IE
+  if (!Array.from) {
+    Array.from = function (object) {
+      return [].slice.call(object);
+    };
+  }
+
+  // Promise polyfill check
+  if (typeof Promise === 'undefined') {
+    console.warn('Promise not supported, some features may not work in older browsers');
+  }
+
+  // IntersectionObserver polyfill check
+  if (!('IntersectionObserver' in window)) {
+    console.warn('IntersectionObserver not supported, using fallback');
+  }
+
+  // CSS.supports polyfill
+  if (!window.CSS || !window.CSS.supports) {
+    window.CSS = window.CSS || {};
+    window.CSS.supports = function() { return false; };
+  }
+}
+
+// Cross-browser event handling
+const addEventListenerCompat = (element, event, handler, options) => {
+  if (element.addEventListener) {
+    element.addEventListener(event, handler, options || false);
+  } else if (element.attachEvent) {
+    element.attachEvent('on' + event, handler);
+  } else {
+    element['on' + event] = handler;
+  }
+};
+
+const removeEventListenerCompat = (element, event, handler, options) => {
+  if (element.removeEventListener) {
+    element.removeEventListener(event, handler, options || false);
+  } else if (element.detachEvent) {
+    element.detachEvent('on' + event, handler);
+  } else {
+    element['on' + event] = null;
+  }
+};
+
+// Cross-browser window.open with fallbacks
+const openWindowCompat = (url, target = '_blank') => {
+  try {
+    // Modern browsers
+    if (window.open) {
+      const newWindow = window.open(url, target, 'noopener,noreferrer');
+      if (!newWindow) {
+        // Popup blocked, try alternative
+        window.location.href = url;
+      }
+      return newWindow;
+    } else {
+      // Fallback for very old browsers
+      window.location.href = url;
+    }
+  } catch (error) {
+    // Final fallback
+    window.location.href = url;
+  }
+};
+
+// Cross-browser smooth scroll polyfill
+const smoothScrollTo = (element, options = {}) => {
+  if (!element) return;
+  
+  // Modern browsers with smooth scroll support
+  if ('scrollBehavior' in document.documentElement.style) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest',
+      ...options
+    });
+  } else {
+    // Polyfill for older browsers
+    const start = window.pageYOffset;
+    const target = element.offsetTop - (options.offset || 80);
+    const distance = target - start;
+    const duration = options.duration || 1000;
+    let startTime = null;
+
+    const animateScroll = (currentTime) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      
+      // Easing function
+      const ease = progress * (2 - progress);
+      
+      window.scrollTo(0, start + distance * ease);
+      
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+
+    if (window.requestAnimationFrame) {
+      requestAnimationFrame(animateScroll);
+    } else {
+      // Fallback for very old browsers
+      setTimeout(() => {
+        window.scrollTo(0, target);
+      }, 100);
+    }
+  }
+};
+
+// Device detection with comprehensive checks
+const getDeviceInfo = () => {
+  if (!isBrowser) return { isMobile: false, isTablet: false, isDesktop: true };
+  
+  const userAgent = navigator.userAgent.toLowerCase();
+  const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  
+  const isMobile = width < 768 || 
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) ||
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    (navigator.msMaxTouchPoints > 0);
+  
+  const isTablet = width >= 768 && width < 1024 && isMobile;
+  const isDesktop = !isMobile && !isTablet;
+  
+  return { isMobile, isTablet, isDesktop };
+};
+
+// Enhanced WhatsApp URL generation with encoding fallbacks
+const generateWhatsAppURL = (phone, message) => {
+  try {
+    // Modern browsers
+    if (encodeURIComponent) {
+      return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    } else {
+      // Fallback encoding for older browsers
+      return `https://wa.me/${phone}?text=${escape(message)}`;
+    }
+  } catch (error) {
+    // Final fallback - basic URL without encoding
+    return `https://wa.me/${phone}`;
+  }
+};
+
 const heroImages = [
   "/images/living-room-1.jpg",
   "/images/living-room-2.jpg",
@@ -68,15 +241,20 @@ const PortfolioCard = ({ category, images, index }) => {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    // Check if device is mobile
+    // Check if device is mobile with comprehensive detection
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      const deviceInfo = getDeviceInfo();
+      setIsMobile(deviceInfo.isMobile);
     }
     
     checkMobile()
-    window.addEventListener('resize', checkMobile)
     
-    return () => window.removeEventListener('resize', checkMobile)
+    // Use cross-browser event listener
+    if (isBrowser) {
+      addEventListenerCompat(window, 'resize', checkMobile);
+      
+      return () => removeEventListenerCompat(window, 'resize', checkMobile);
+    }
   }, [])
 
   useEffect(() => {
@@ -184,6 +362,104 @@ const PortfolioCard = ({ category, images, index }) => {
   )
 }
 
+// Browser detection and feature support
+const getBrowserInfo = () => {
+  if (!isBrowser) return { name: 'server', version: '0', isSupported: true };
+  
+  const userAgent = navigator.userAgent;
+  let browserName = 'unknown';
+  let browserVersion = '0';
+  let isSupported = true;
+  
+  // Detect browser
+  if (userAgent.indexOf('Chrome') > -1) {
+    browserName = 'Chrome';
+    browserVersion = userAgent.match(/Chrome\/(\d+)/)?.[1] || '0';
+  } else if (userAgent.indexOf('Firefox') > -1) {
+    browserName = 'Firefox';
+    browserVersion = userAgent.match(/Firefox\/(\d+)/)?.[1] || '0';
+  } else if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) {
+    browserName = 'Safari';
+    browserVersion = userAgent.match(/Version\/(\d+)/)?.[1] || '0';
+  } else if (userAgent.indexOf('Edge') > -1) {
+    browserName = 'Edge';
+    browserVersion = userAgent.match(/Edge\/(\d+)/)?.[1] || '0';
+  } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
+    browserName = 'IE';
+    browserVersion = userAgent.match(/(?:MSIE |rv:)(\d+)/)?.[1] || '0';
+    isSupported = parseInt(browserVersion) >= 11; // IE 11+ support
+  }
+  
+  return { name: browserName, version: parseInt(browserVersion), isSupported };
+};
+
+// Feature detection
+const checkFeatureSupport = () => {
+  if (!isBrowser) return { all: true };
+  
+  return {
+    flexbox: CSS.supports('display', 'flex') || CSS.supports('display', '-webkit-flex'),
+    grid: CSS.supports('display', 'grid'),
+    transforms: CSS.supports('transform', 'translateZ(0)') || CSS.supports('-webkit-transform', 'translateZ(0)'),
+    animations: CSS.supports('animation', 'none') || CSS.supports('-webkit-animation', 'none'),
+    backdropFilter: CSS.supports('backdrop-filter', 'blur(10px)') || CSS.supports('-webkit-backdrop-filter', 'blur(10px)'),
+    webp: false, // Will be detected dynamically
+    avif: false, // Will be detected dynamically
+    intersectionObserver: 'IntersectionObserver' in window,
+    requestAnimationFrame: 'requestAnimationFrame' in window,
+    localStorage: (() => {
+      try {
+        const test = 'test';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })()
+  };
+};
+
+// Error boundary for graceful degradation
+const handleError = (error, errorInfo) => {
+  console.warn('Karel Interior Designs: Non-critical error handled gracefully:', error);
+  // Could send to error reporting service
+};
+
+// Initialize browser compatibility on load
+if (isBrowser) {
+  const browserInfo = getBrowserInfo();
+  const features = checkFeatureSupport();
+  
+  // Add browser class to body for CSS targeting
+  document.body.className += ` browser-${browserInfo.name.toLowerCase()} version-${browserInfo.version}`;
+  
+  // Add feature classes
+  Object.keys(features).forEach(feature => {
+    if (features[feature]) {
+      document.body.className += ` supports-${feature}`;
+    } else {
+      document.body.className += ` no-${feature}`;
+    }
+  });
+  
+  // Warn about unsupported browsers
+  if (!browserInfo.isSupported) {
+    console.warn('Karel Interior Designs: Your browser may not support all features. Please consider updating to a modern browser.');
+  }
+  
+  // Detect WebP support
+  const webpTest = new Image();
+  webpTest.onload = webpTest.onerror = function() {
+    if (webpTest.height === 2) {
+      document.body.className += ' supports-webp';
+    } else {
+      document.body.className += ' no-webp';
+    }
+  };
+  webpTest.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+}
+
 export default function KarelInteriorDesigns() {
   const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -204,8 +480,59 @@ export default function KarelInteriorDesigns() {
     }))
   }
 
+  useEffect(() => {
+    // Handle initial dark mode with cross-browser support
+    if (isBrowser) {
+      const isDark = document.documentElement.classList.contains('dark') ||
+                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      setDarkMode(isDark);
+    }
+    
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const toggleDarkMode = useCallback(() => {
+    setDarkMode(!darkMode)
+    if (isBrowser && document.documentElement.classList) {
+      document.documentElement.classList.toggle("dark")
+    } else if (isBrowser) {
+      // Fallback for older browsers
+      const html = document.documentElement;
+      if (html.className.indexOf('dark') !== -1) {
+        html.className = html.className.replace('dark', '');
+      } else {
+        html.className += ' dark';
+      }
+    }
+  }, [darkMode])
+
+  const scrollToSection = useCallback(
+    (sectionId) => {
+      setMobileMenuOpen(false)
+
+      setTimeout(
+        () => {
+          if (isBrowser) {
+            const element = document.getElementById(sectionId)
+            if (element) {
+              // Use our cross-browser smooth scroll
+              smoothScrollTo(element, { offset: 80 });
+            }
+          }
+        },
+        mobileMenuOpen ? 150 : 0,
+      )
+    },
+    [mobileMenuOpen],
+  )
+
   const handleWhatsAppSubmit = (e) => {
     e.preventDefault()
+    e.stopPropagation()
+    
     const { firstName, lastName, email, phone, message } = formData
     
     const whatsappMessage = `Hello! I'm interested in Karel Interior Designs services.
@@ -220,10 +547,15 @@ ${message}
 
 I would love to discuss this project further with you.`
 
-    const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(whatsappMessage)}`
-    window.open(whatsappUrl, '_blank')
+    // Use cross-browser WhatsApp URL generation
+    const whatsappUrl = generateWhatsAppURL('254796813721', whatsappMessage);
     
-    // Reset form after submission
+    // Use cross-browser window opening with 0 delay for immediate execution
+    setTimeout(() => {
+      openWindowCompat(whatsappUrl);
+    }, 0)
+    
+    // Reset form immediately after opening WhatsApp
     setFormData({
       firstName: '',
       lastName: '',
@@ -235,56 +567,13 @@ I would love to discuss this project further with you.`
 
   const handleWhatsAppButton = () => {
     const message = "Hello, I would love to know more about Karel Interior Designs, what services do you offer?"
-    const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
-  }
-
-  useEffect(() => {
-    // Handle initial dark mode
-    if (typeof window !== 'undefined') {
-      const isDark = document.documentElement.classList.contains('dark')
-      setDarkMode(isDark)
-    }
+    const whatsappUrl = generateWhatsAppURL('254796813721', message);
     
-    const interval = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)
-    }, 6000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode(!darkMode)
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.toggle("dark")
-    }
-  }, [darkMode])
-
-  const scrollToSection = useCallback(
-    (sectionId) => {
-      setMobileMenuOpen(false)
-
-      setTimeout(
-        () => {
-          if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-            const element = document.getElementById(sectionId)
-            if (element) {
-              const navbar = document.querySelector("nav")
-              const navbarHeight = navbar ? navbar.offsetHeight : 80
-              const elementPosition = element.offsetTop
-              const offsetPosition = elementPosition - navbarHeight + 4
-
-              window.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth",
-              })
-            }
-          }
-        },
-        mobileMenuOpen ? 150 : 0,
-      )
-    },
-    [mobileMenuOpen],
-  )
+    // Use cross-browser window opening with 0 delay for immediate execution
+    setTimeout(() => {
+      openWindowCompat(whatsappUrl);
+    }, 0)
+  }
 
   return (
     <div
@@ -696,8 +985,13 @@ I would love to discuss this project further with you.`
                     <Input placeholder="Phone Number" name="phone" value={formData.phone} onChange={handleInputChange} className="glow-input w-full" />
                     <Textarea placeholder="Tell us about your project..." name="message" value={formData.message} onChange={handleInputChange} rows={4} className="glow-input w-full" />
                     <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 glow-button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleWhatsAppSubmit(e)
+                      }}
+                      type="button"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 glow-button transform-gpu"
                     >
                       Send Message
                     </Button>
