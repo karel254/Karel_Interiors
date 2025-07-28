@@ -64,19 +64,38 @@ const testimonials = [
 // Optimized Portfolio Card Component
 const PortfolioCard = ({ category, images, index }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     if (images.length <= 1) return
+
+    // Only run slideshow if mobile OR (desktop AND hovered)
+    const shouldRunSlideshow = isMobile || (!isMobile && isHovered)
+    
+    if (!shouldRunSlideshow) return
 
     const interval = setInterval(
       () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length)
       },
-      5000 + index * 800,
-    ) // Stagger the intervals
+      isMobile ? 5000 + index * 800 : 2000, // Faster on desktop hover
+    )
 
     return () => clearInterval(interval)
-  }, [images.length, index])
+  }, [images.length, index, isHovered, isMobile])
 
   const categoryDescriptions = useMemo(
     () => ({
@@ -99,6 +118,14 @@ const PortfolioCard = ({ category, images, index }) => {
         y: -5,
         rotateY: 2,
         transition: { duration: 0.3 }
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        // Reset to first image when leaving hover on desktop
+        if (!isMobile) {
+          setCurrentImageIndex(0)
+        }
       }}
     >
       <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 glow-card-hover group transform-gpu hover:scale-105 card-3d w-full perspective-1000">
