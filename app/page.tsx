@@ -222,10 +222,19 @@ I would love to discuss this project further with you.`
 
     const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(whatsappMessage)}`
     window.open(whatsappUrl, '_blank')
+    
+    // Reset form after submission
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      message: ''
+    })
   }
 
   const handleWhatsAppButton = () => {
-    const message = "Hello, I would love to know more about Karel interiors, what services do you offer?"
+    const message = "Hello, I would love to know more about Karel Interior Designs, what services do you offer?"
     const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
   }
@@ -740,7 +749,14 @@ I would love to discuss this project further with you.`
               </div>
 
               <div className="pt-6 sm:pt-8">
-                <Button onClick={handleWhatsAppButton} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2">
+                <Button 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleWhatsAppButton()
+                  }}
+                  type="button"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2"
+                >
                   <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>WhatsApp Us</span>
                 </Button>
