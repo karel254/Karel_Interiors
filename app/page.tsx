@@ -188,6 +188,47 @@ export default function KarelInteriorDesigns() {
   const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0)
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    message: ''
+  })
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleWhatsAppSubmit = (e) => {
+    e.preventDefault()
+    const { firstName, lastName, email, phone, message } = formData
+    
+    const whatsappMessage = `Hello! I'm interested in Karel Interior Designs services.
+
+*Contact Details:*
+Name: ${firstName} ${lastName}
+Email: ${email}
+Phone: ${phone}
+
+*Project Details:*
+${message}
+
+I would love to discuss this project further with you.`
+
+    const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(whatsappMessage)}`
+    window.open(whatsappUrl, '_blank')
+  }
+
+  const handleWhatsAppButton = () => {
+    const message = "Hello, I would love to know more about Karel interiors, what services do you offer?"
+    const whatsappUrl = `https://wa.me/254796813721?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   useEffect(() => {
     // Handle initial dark mode
@@ -637,14 +678,14 @@ export default function KarelInteriorDesigns() {
                   <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">
                     Get In Touch
                   </h3>
-                  <form className="space-y-4 sm:space-y-6 w-full">
+                  <form onSubmit={handleWhatsAppSubmit} className="space-y-4 sm:space-y-6 w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                      <Input placeholder="First Name" className="glow-input w-full" />
-                      <Input placeholder="Last Name" className="glow-input w-full" />
+                      <Input placeholder="First Name" name="firstName" value={formData.firstName} onChange={handleInputChange} className="glow-input w-full" />
+                      <Input placeholder="Last Name" name="lastName" value={formData.lastName} onChange={handleInputChange} className="glow-input w-full" />
                     </div>
-                    <Input type="email" placeholder="Email Address" className="glow-input w-full" />
-                    <Input placeholder="Phone Number" className="glow-input w-full" />
-                    <Textarea placeholder="Tell us about your project..." rows={4} className="glow-input w-full" />
+                    <Input type="email" placeholder="Email Address" name="email" value={formData.email} onChange={handleInputChange} className="glow-input w-full" />
+                    <Input placeholder="Phone Number" name="phone" value={formData.phone} onChange={handleInputChange} className="glow-input w-full" />
+                    <Textarea placeholder="Tell us about your project..." name="message" value={formData.message} onChange={handleInputChange} rows={4} className="glow-input w-full" />
                     <Button
                       type="submit"
                       className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 glow-button"
@@ -674,7 +715,7 @@ export default function KarelInteriorDesigns() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">Phone</p>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">+1 (555) 123-4567</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">+254796813721</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -683,7 +724,7 @@ export default function KarelInteriorDesigns() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">Email</p>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">hello@karelinterior.com</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">karelinteriors@gmail.com</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -692,14 +733,14 @@ export default function KarelInteriorDesigns() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">Location</p>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">New York, NY</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Juja, Kenya</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="pt-6 sm:pt-8">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2">
+                <Button onClick={handleWhatsAppButton} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2">
                   <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>WhatsApp Us</span>
                 </Button>
