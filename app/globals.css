@@ -54,11 +54,15 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
   *::before,
   *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
@@ -71,6 +75,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -83,60 +88,99 @@
     line-height: 1.5;
   }
 
-  /* Optimized image rendering */
+  /* Performance optimizations with cross-browser support */
   img {
     image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    image-rendering: pixelated;
     max-width: 100%;
     height: auto;
+    -ms-interpolation-mode: bicubic;
   }
 
-  /* Smooth scrolling */
+  /* Smooth scrolling with fallbacks */
   html {
     scroll-behavior: smooth;
+    -webkit-scroll-behavior: smooth;
+    -moz-scroll-behavior: smooth;
+    -ms-scroll-behavior: smooth;
   }
 
-  /* GPU acceleration for better performance */
-  .transform-gpu {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: transform;
-  }
-
-  /* Optimized transitions */
-  @media (prefers-reduced-motion: no-preference) {
-    .animate-smooth {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Support for older browsers */
+  @supports not (scroll-behavior: smooth) {
+    html {
+      scroll-behavior: auto;
     }
   }
 
+  /* GPU acceleration with cross-browser prefixes */
+  .transform-gpu {
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    -moz-perspective: 1000px;
+    -ms-perspective: 1000px;
+    perspective: 1000px;
+    will-change: transform;
+  }
+
+  /* Optimize animations with prefixes */
+  @media (prefers-reduced-motion: no-preference) {
+    .animate-smooth {
+      -webkit-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -moz-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -ms-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -o-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  /* Fallback for browsers that don't support prefers-reduced-motion */
   .animate-smooth {
-    transition: all 0.2s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -ms-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
   }
 }
 
-/* Prevent horizontal scroll */
+/* Prevent horizontal scroll with cross-browser support */
 * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
 html {
   overflow-x: hidden;
   max-width: 100vw;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
   overflow-x: hidden;
   max-width: 100vw;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Container constraints */
+/* Container constraints with IE support */
 .container {
   max-width: 100%;
   margin: 0 auto;
   padding-left: 1rem;
   padding-right: 1rem;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -145,6 +189,48 @@ body {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
+}
+
+/* Cross-browser flexbox support */
+.flex {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex-col {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.items-center {
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.justify-center {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.justify-between {
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
 }
 
 /* Ensure navbar stays sticky at the top */
@@ -156,13 +242,20 @@ nav,
   left: 0 !important;
   right: 0 !important;
   z-index: 9999 !important;
+  /* Override any conflicting transforms */
   transform: translateZ(0) !important;
+  /* Ensure it stays above all content */
   pointer-events: auto !important;
 }
 
-/* Simplified navigation */
+/* 3D Navigation effects with cross-browser support */
 nav {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
   transform: translateZ(0);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   position: fixed !important;
   top: 0 !important;
@@ -170,7 +263,16 @@ nav {
   right: 0 !important;
   z-index: 9999 !important;
   will-change: transform;
+  /* Ensure sticky positioning works */
+  transform-style: preserve-3d;
+  /* Fallback for browsers without backdrop-filter */
   background-color: rgba(255, 255, 255, 0.9);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  nav {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
 }
 
 @supports not (backdrop-filter: blur(20px)) {
@@ -179,9 +281,15 @@ nav {
   }
 }
 
-/* Dark mode nav */
+/* Dark mode nav fallback */
 .dark nav {
   background-color: rgba(15, 23, 42, 0.9);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .dark nav {
+    background-color: rgba(15, 23, 42, 0.9);
+  }
 }
 
 @supports not (backdrop-filter: blur(20px)) {
@@ -190,42 +298,46 @@ nav {
   }
 }
 
-/* Simplified navbar text effects */
+/* Optimized navbar brand text with reduced complexity */
 .navbar-brand-text {
   background: linear-gradient(135deg, #00d4ff 0%, #3b82f6 25%, #06b6d4 50%, #0ea5e9 75%, #00d4ff 100%);
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
   background-size: 200% 200%;
-  animation: shimmer 2s ease-in-out infinite;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
-  font-weight: 700;
-  will-change: transform, filter, text-shadow;
+  animation: shimmer 3s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.4));
+  transform: translateZ(0);
+  will-change: transform, filter;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
 /* Light theme specific styling */
 .navbar-brand-text {
-  text-shadow: 0 0 15px rgba(6, 182, 212, 0.9);
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
 }
 
 /* Dark theme specific styling */
 .dark .navbar-brand-text {
-  text-shadow: 0 0 20px rgba(56, 189, 248, 1);
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5));
 }
 
 .navbar-brand-text:hover {
-  transform: scale(1.05);
+  transform: translateZ(0) scale(1.02);
 }
 
 /* Light theme hover */
 .navbar-brand-text:hover {
-  text-shadow: 0 0 20px rgba(6, 182, 212, 1);
+  text-shadow: 0 0 15px rgba(6, 182, 212, 0.9);
 }
 
 /* Dark theme hover */
 .dark .navbar-brand-text:hover {
-  text-shadow: 0 0 25px rgba(56, 189, 248, 1);
+  text-shadow: 0 0 20px rgba(56, 189, 248, 1);
 }
 
 /* Simplified keyframe animations */
@@ -238,27 +350,30 @@ nav {
 /* Simplified glow pulse animation */
 @keyframes glowPulse {
   0%, 100% {
-    text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+    text-shadow: 0 0 5px rgba(6, 182, 212, 0.4);
   }
   50% {
-    text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
   }
 }
 
 .glow-pulse {
-  animation: glowPulse 1.5s ease-in-out infinite;
+  animation: glowPulse 2s ease-in-out infinite;
   will-change: filter, text-shadow;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
 /* Simplified glow effects */
 .glow-card-hover:hover {
-  box-shadow: 0 8px 40px rgba(59, 130, 246, 0.2);
-  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
 }
 
 .dark .glow-card-hover:hover {
-  box-shadow: 0 8px 45px rgba(147, 197, 253, 0.25);
+  box-shadow: 0 4px 25px rgba(147, 197, 253, 0.2);
+  border-color: rgba(147, 197, 253, 0.3);
 }
 
 /* Smooth scale utilities */
@@ -270,31 +385,64 @@ nav {
   transform: scale(1.05);
 }
 
-/* Simplified input focus effects */
-.glow-input:focus {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-  border-color: rgba(59, 130, 246, 0.5);
+/* Remove heavy 3D transforms and replace with simple hover effects */
+.hover\:rotate-x-2:hover {
+  transform: translateY(-1px);
 }
 
-.dark .glow-input:focus {
-  box-shadow: 0 0 20px rgba(147, 197, 253, 0.4);
-  border-color: rgba(147, 197, 253, 0.6);
+.hover\:rotate-x-5:hover {
+  transform: translateY(-2px);
 }
 
-/* Optimized image transitions */
-img {
-  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  max-width: 100%;
-  height: auto;
-  will-change: transform;
-  backface-visibility: hidden;
+.hover\:-rotate-y-5:hover {
+  transform: translateY(-1px);
+}
+
+/* Simplified card 3D effects */
+.card-3d:hover {
+  transform: translateY(-2px);
+}
+
+.glow-button-3d:hover {
+  transform: translateY(-1px);
+}
+
+/* Remove complex perspective transforms */
+.perspective-1000 {
   transform: translateZ(0);
 }
 
-/* Enhanced mobile responsiveness */
+/* Simplified input focus effects */
+.glow-input:focus {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.dark .glow-input:focus {
+  box-shadow: 0 0 15px rgba(147, 197, 253, 0.3);
+  border-color: rgba(147, 197, 253, 0.5);
+}
+
+/* Optimize image transitions */
+img {
+  transition: transform 0.2s ease-out;
+  max-width: 100%;
+  height: auto;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Enhanced mobile responsiveness for 3D effects */
 @media (max-width: 768px) {
   .card-3d:hover {
-    transform: translateZ(10px);
+    transform: perspective(1000px) rotateX(2deg) translateZ(10px);
+  }
+
+  .glow-button-3d:hover {
+    transform: perspective(1000px) rotateX(-2deg) translateY(-1px) translateZ(5px);
   }
 
   .container {
@@ -308,7 +456,10 @@ img {
   .card-3d:hover,
   .glow-button-3d:hover,
   .hover\:scale-102:hover,
-  .hover\:scale-105:hover {
+  .hover\:scale-105:hover,
+  .hover\:rotate-x-2:hover,
+  .hover\:rotate-x-5:hover,
+  .hover\:-rotate-y-5:hover {
     transform: none;
   }
 }
@@ -338,16 +489,30 @@ section {
   }
 }
 
-/* Performance optimizations */
+/* Performance optimizations for zero lag */
 * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+  /* Force hardware acceleration for all elements */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
   transform: translateZ(0);
+  /* Optimize rendering */
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
   backface-visibility: hidden;
+  /* Reduce paint operations */
   will-change: auto;
 }
 
 *::before,
 *::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -358,42 +523,154 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  /* Optimize scrolling */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
   transform: translateZ(0);
+  /* Ensure proper positioning context */
   position: relative;
+  /* Ensure navbar can be sticky */
   overflow-x: hidden;
 }
 
-/* Optimize images */
+/* Optimize images for zero lag */
 img {
   image-rendering: -webkit-optimize-contrast;
+  image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  -ms-interpolation-mode: bicubic;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
   transform: translateZ(0);
+  /* Optimize rendering */
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
 /* Optimize smooth scrolling */
 html {
+  -webkit-scroll-behavior: smooth;
+  -moz-scroll-behavior: smooth;
+  -ms-scroll-behavior: smooth;
   scroll-behavior: smooth;
 }
 
 /* Enhanced GPU acceleration */
 .transform-gpu {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
   transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -moz-perspective: 1000px;
+  -ms-perspective: 1000px;
   perspective: 1000px;
+  /* Optimize for animations */
   will-change: transform;
 }
 
 /* Ultra-smooth transitions */
 @media (prefers-reduced-motion: no-preference) {
   .animate-smooth {
+    -webkit-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -moz-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -ms-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -o-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 }
 
 /* Fallback for reduced motion */
 .animate-smooth {
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
   transition: all 0.2s ease;
+}
+
+/* Performance optimizations to eliminate lag */
+/* Override heavy animations with simpler alternatives */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-smooth {
+    transition: all 0.2s ease-out !important;
+  }
+}
+
+/* Simplify all hover effects */
+.hover\:scale-102:hover,
+.hover\:scale-105:hover {
+  transform: scale(1.02) !important;
+}
+
+.hover\:rotate-x-2:hover,
+.hover\:rotate-x-5:hover,
+.hover\:-rotate-y-5:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Optimize card animations */
+.card-3d:hover,
+.glow-card-hover:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Reduce animation complexity */
+.navbar-brand-text {
+  animation: shimmer 4s ease-in-out infinite !important;
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite !important;
+}
+
+/* Optimize image loading */
+img {
+  transition: transform 0.2s ease-out !important;
+  will-change: auto !important;
+}
+
+/* Force hardware acceleration for critical elements */
+nav,
+.motion.nav,
+[class*="fixed top-0"] {
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+/* Reduce paint operations */
+* {
+  will-change: auto !important;
+}
+
+/* Optimize for mobile */
+@media (max-width: 768px) {
+  .navbar-brand-text {
+    animation: none !important;
+  }
+  
+  .glow-pulse {
+    animation: none !important;
+  }
+  
+  .card-3d:hover,
+  .glow-card-hover:hover {
+    transform: none !important;
+  }
 }
