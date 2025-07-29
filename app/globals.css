@@ -674,3 +674,29 @@ nav,
     transform: none !important;
   }
 }
+
+/* Final navigation stickiness override */
+motion.nav,
+[class*="motion.nav"],
+nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important;
+  transform: translateZ(0) !important;
+  pointer-events: auto !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark motion.nav,
+.dark [class*="motion.nav"],
+.dark nav {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* Ensure navigation container is properly positioned */
+nav > div {
+  position: relative !important;
+  z-index: 1 !important;
+}

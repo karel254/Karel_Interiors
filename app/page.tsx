@@ -390,6 +390,19 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
               target.src = "/placeholder.svg";
             }}
           />
+          {/* Preload next image to prevent blank moments */}
+          {images.length > 1 && (
+            <Image
+              src={images[(currentImageIndex + 1) % images.length] || "/placeholder.svg"}
+              alt=""
+              fill
+              className="object-cover opacity-0 pointer-events-none"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
         </div>
         <CardContent className="p-6 w-full">
@@ -775,6 +788,13 @@ I would love to discuss this project further with you.`
           ease: "easeOut"
         }}
         className="fixed top-0 left-0 right-0 w-full z-[9999] backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg transform-gpu"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999
+        }}
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between w-full">
@@ -913,7 +933,7 @@ I would love to discuss this project further with you.`
                 }}
                 exit={{ opacity: 0 }}
                 transition={{ 
-                  duration: 0.4, 
+                  duration: 0.6, 
                   ease: "easeInOut"
                 }}
                 className="absolute inset-0 w-full h-full"
@@ -941,6 +961,17 @@ I would love to discuss this project further with you.`
               </motion.div>
           ))}
           </AnimatePresence>
+          {/* Preload next hero image to prevent blank moments */}
+          <Image
+            src={heroImages[(currentHeroIndex + 1) % heroImages.length] || "/placeholder.svg"}
+            alt=""
+            fill
+            className="object-cover opacity-0 pointer-events-none"
+            sizes="100vw"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          />
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent w-full h-full" />
 
