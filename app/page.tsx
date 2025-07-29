@@ -332,13 +332,26 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
     <motion.div
       initial={{ opacity: 0, y: 50, rotateX: -10 }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: "easeOut" }}
+      transition={{ 
+        duration: 0.4, 
+        delay: index * 0.05, 
+        ease: [0.4, 0.0, 0.2, 1],
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }}
       viewport={{ once: true, margin: "-50px" }}
       className="w-full transform-gpu"
       whileHover={{ 
         y: -5,
         rotateY: 2,
-        transition: { duration: 0.3 }
+        transition: { 
+          duration: 0.2, 
+          ease: [0.4, 0.0, 0.2, 1],
+          type: "spring",
+          stiffness: 400,
+          damping: 25
+        }
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -355,17 +368,20 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
           {images.map((src, imgIndex) => (
               <motion.div
               key={src}
-                initial={{ opacity: 0, scale: 1.05 }}
+                initial={{ opacity: 0, scale: 1.02 }}
                 animate={{ 
                   opacity: imgIndex === currentImageIndex ? 1 : 0,
-                  scale: imgIndex === currentImageIndex ? 1 : 1.05
+                  scale: imgIndex === currentImageIndex ? 1 : 1.02
                 }}
-                exit={{ opacity: 0, scale: 1.05 }}
+                exit={{ opacity: 0, scale: 1.02 }}
                 transition={{ 
-                  duration: 0.8, 
-                  ease: [0.4, 0.0, 0.2, 1], // Custom easing for smoother transitions
-                  opacity: { duration: 0.6 },
-                  scale: { duration: 0.8 }
+                  duration: 0.4, 
+                  ease: [0.4, 0.0, 0.2, 1],
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  opacity: { duration: 0.3 },
+                  scale: { duration: 0.4 }
                 }}
                 className="absolute inset-0"
             >
@@ -755,12 +771,28 @@ I would love to discuss this project further with you.`
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 w-full z-[9999] backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg"
-        style={{ position: 'fixed' }}
+        transition={{ 
+          duration: 0.3, 
+          ease: [0.4, 0.0, 0.2, 1],
+          type: "spring",
+          stiffness: 300,
+          damping: 30
+        }}
+        className="fixed top-0 left-0 right-0 w-full z-[9999] backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg transform-gpu"
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between w-full">
-            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center flex-shrink-0 space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              transition={{ 
+                duration: 0.2, 
+                ease: [0.4, 0.0, 0.2, 1],
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }}
+              className="flex items-center flex-shrink-0 space-x-3"
+            >
               <Image
                 src="/images/karel-logo.png"
                 alt="Karel Interior Designs"
@@ -772,7 +804,14 @@ I would love to discuss this project further with you.`
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
+                transition={{ 
+                  delay: 0.1, 
+                  duration: 0.4, 
+                  ease: [0.4, 0.0, 0.2, 1],
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30
+                }}
                 className="hidden sm:block"
               >
                 <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
@@ -783,7 +822,14 @@ I would love to discuss this project further with you.`
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
+                transition={{ 
+                  delay: 0.1, 
+                  duration: 0.4, 
+                  ease: [0.4, 0.0, 0.2, 1],
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30
+                }}
                 className="block sm:hidden"
               >
                 <h1 className="text-sm font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
@@ -840,7 +886,13 @@ I would love to discuss this project further with you.`
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ 
+                duration: 0.15, 
+                ease: [0.4, 0.0, 0.2, 1],
+                type: "spring",
+                stiffness: 500,
+                damping: 30
+              }}
               className="md:hidden mt-4 pb-4 w-full"
             >
               {["Home", "About", "Work", "Testimonials", "Contact"].map((item) => (
@@ -868,17 +920,20 @@ I would love to discuss this project further with you.`
           {heroImages.map((src, index) => (
               <motion.div
               key={src}
-                initial={{ opacity: 0, scale: 1.05 }}
+                initial={{ opacity: 0, scale: 1.02 }}
                 animate={{ 
                   opacity: index === (currentHeroIndex % heroImages.length) ? 1 : 0,
-                  scale: index === (currentHeroIndex % heroImages.length) ? 1 : 1.05
+                  scale: index === (currentHeroIndex % heroImages.length) ? 1 : 1.02
                 }}
-                exit={{ opacity: 0, scale: 1.05 }}
+                exit={{ opacity: 0, scale: 1.02 }}
                 transition={{ 
-                  duration: 1.2, 
-                  ease: [0.4, 0.0, 0.2, 1], // Custom easing for smoother transitions
-                  opacity: { duration: 0.8 },
-                  scale: { duration: 1.2 }
+                  duration: 0.6, 
+                  ease: [0.4, 0.0, 0.2, 1],
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 25,
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.6 }
                 }}
                 className="absolute inset-0 w-full h-full"
             >
@@ -912,12 +967,25 @@ I would love to discuss this project further with you.`
           <motion.h1
             initial={{ y: 50, opacity: 0, rotateX: -15 }}
             animate={{ y: 0, opacity: 1, rotateX: 0 }}
-            transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
+            transition={{ 
+              delay: 0.1, 
+              duration: 0.6, 
+              ease: [0.4, 0.0, 0.2, 1],
+              type: "spring",
+              stiffness: 200,
+              damping: 25
+            }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight transform-gpu perspective-1000"
             whileHover={{ 
               scale: 1.02,
               rotateY: 2,
-              transition: { duration: 0.3 }
+              transition: { 
+                duration: 0.2, 
+                ease: [0.4, 0.0, 0.2, 1],
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }
             }}
           >
             Karel Interior
@@ -929,7 +997,14 @@ I would love to discuss this project further with you.`
           <motion.p
             initial={{ y: 30, opacity: 0, rotateX: -10 }}
             animate={{ y: 0, opacity: 1, rotateX: 0 }}
-            transition={{ delay: 0.4, duration: 1.0, ease: "easeOut" }}
+            transition={{ 
+              delay: 0.2, 
+              duration: 0.5, 
+              ease: [0.4, 0.0, 0.2, 1],
+              type: "spring",
+              stiffness: 250,
+              damping: 25
+            }}
             className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200 transform-gpu"
           >
             "Where Imagination Becomes a Masterpiece" 🎨
@@ -938,13 +1013,32 @@ I would love to discuss this project further with you.`
           <motion.div
             initial={{ y: 30, opacity: 0, scale: 0.9, rotateX: -5 }}
             animate={{ y: 0, opacity: 1, scale: 1, rotateX: 0 }}
-            transition={{ delay: 0.6, duration: 1.0, ease: "easeOut" }}
+            transition={{ 
+              delay: 0.3, 
+              duration: 0.5, 
+              ease: [0.4, 0.0, 0.2, 1],
+              type: "spring",
+              stiffness: 300,
+              damping: 25
+            }}
             whileHover={{ 
               scale: 1.05,
               rotateY: 3,
-              transition: { duration: 0.3 }
+              transition: { 
+                duration: 0.2, 
+                ease: [0.4, 0.0, 0.2, 1],
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ 
+              scale: 0.95,
+              transition: { 
+                duration: 0.1, 
+                ease: [0.4, 0.0, 0.2, 1]
+              }
+            }}
             className="transform-gpu"
           >
             <Button

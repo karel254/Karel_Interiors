@@ -233,6 +233,21 @@ body {
   justify-content: space-between;
 }
 
+/* Ensure navbar stays sticky at the top */
+nav,
+.motion.nav,
+[class*="fixed top-0"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  /* Override any conflicting transforms */
+  transform: translateZ(0) !important;
+  /* Ensure it stays above all content */
+  pointer-events: auto !important;
+}
+
 /* 3D Navigation effects with cross-browser support */
 nav {
   -webkit-transform: translateZ(0);
@@ -248,6 +263,8 @@ nav {
   right: 0 !important;
   z-index: 9999 !important;
   will-change: transform;
+  /* Ensure sticky positioning works */
+  transform-style: preserve-3d;
   /* Fallback for browsers without backdrop-filter */
   background-color: rgba(255, 255, 255, 0.9);
 }
@@ -298,11 +315,11 @@ nav {
   -moz-background-size: 200% 200%;
   -o-background-size: 200% 200%;
   background-size: 200% 200%;
-  -webkit-animation: shimmer 3s ease-in-out infinite;
-  -moz-animation: shimmer 3s ease-in-out infinite;
-  -ms-animation: shimmer 3s ease-in-out infinite;
-  -o-animation: shimmer 3s ease-in-out infinite;
-  animation: shimmer 3s ease-in-out infinite;
+  -webkit-animation: shimmer 2s ease-in-out infinite;
+  -moz-animation: shimmer 2s ease-in-out infinite;
+  -ms-animation: shimmer 2s ease-in-out infinite;
+  -o-animation: shimmer 2s ease-in-out infinite;
+  animation: shimmer 2s ease-in-out infinite;
   text-shadow: 
     0 0 10px rgba(6, 182, 212, 0.8),
     0 0 20px rgba(6, 182, 212, 0.6),
@@ -318,6 +335,12 @@ nav {
   /* Enhanced fallback for better visibility */
   color: #06b6d4;
   font-weight: 700;
+  /* Performance optimizations */
+  will-change: transform, filter, text-shadow;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Light theme specific styling */
@@ -459,11 +482,17 @@ nav {
 }
 
 .glow-pulse {
-  -webkit-animation: glowPulse 2s ease-in-out infinite;
-  -moz-animation: glowPulse 2s ease-in-out infinite;
-  -ms-animation: glowPulse 2s ease-in-out infinite;
-  -o-animation: glowPulse 2s ease-in-out infinite;
-  animation: glowPulse 2s ease-in-out infinite;
+  -webkit-animation: glowPulse 1.5s ease-in-out infinite;
+  -moz-animation: glowPulse 1.5s ease-in-out infinite;
+  -ms-animation: glowPulse 1.5s ease-in-out infinite;
+  -o-animation: glowPulse 1.5s ease-in-out infinite;
+  animation: glowPulse 1.5s ease-in-out infinite;
+  /* Performance optimizations */
+  will-change: filter, text-shadow;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Enhanced glow effects with 3D depth */
@@ -516,9 +545,21 @@ nav {
 
 /* Smooth image transitions */
 img {
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   max-width: 100%;
   height: auto;
+  /* Performance optimizations */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Enhanced mobile responsiveness for 3D effects */
@@ -573,4 +614,119 @@ section {
     font-size: 3rem;
     line-height: 1.1;
   }
+}
+
+/* Performance optimizations for zero lag */
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  /* Force hardware acceleration for all elements */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Optimize rendering */
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Reduce paint operations */
+  will-change: auto;
+}
+
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  /* Optimize scrolling */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Ensure proper positioning context */
+  position: relative;
+  /* Ensure navbar can be sticky */
+  overflow-x: hidden;
+}
+
+/* Optimize images for zero lag */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: bicubic;
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Optimize rendering */
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Optimize smooth scrolling */
+html {
+  -webkit-scroll-behavior: smooth;
+  -moz-scroll-behavior: smooth;
+  -ms-scroll-behavior: smooth;
+  scroll-behavior: smooth;
+}
+
+/* Enhanced GPU acceleration */
+.transform-gpu {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -moz-perspective: 1000px;
+  -ms-perspective: 1000px;
+  perspective: 1000px;
+  /* Optimize for animations */
+  will-change: transform;
+}
+
+/* Ultra-smooth transitions */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-smooth {
+    -webkit-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -moz-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -ms-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -o-transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+}
+
+/* Fallback for reduced motion */
+.animate-smooth {
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
