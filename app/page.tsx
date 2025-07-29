@@ -370,39 +370,33 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ category, images, index }
     >
       <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 group transform-gpu hover:scale-[1.02] w-full">
         <div className="relative h-80 overflow-hidden w-full">
-          {/* Optimized image display - only show current image */}
-          <Image
-            src={images[currentImageIndex] || "/placeholder.svg"}
-            alt={`${category} ${currentImageIndex + 1}`}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500 transform-gpu"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-            onLoad={() => {
-              console.log(`Successfully loaded portfolio image: ${images[currentImageIndex]}`);
-            }}
-            onError={(e) => {
-              console.warn(`Failed to load portfolio image: ${images[currentImageIndex]}`);
-              // Fallback to placeholder
-              const target = e.target as HTMLImageElement;
-              target.src = "/placeholder.svg";
-            }}
-          />
-          {/* Preload next image to prevent blank moments */}
-          {images.length > 1 && (
+          {/* Show all images with opacity transitions */}
+          {images.map((src, imgIndex) => (
             <Image
-              src={images[(currentImageIndex + 1) % images.length] || "/placeholder.svg"}
-              alt=""
+              key={src}
+              src={src || "/placeholder.svg"}
+              alt={`${category} ${imgIndex + 1}`}
               fill
-              className="object-cover opacity-0 pointer-events-none"
+              className="object-cover group-hover:scale-105 transform-gpu"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+              style={{
+                opacity: imgIndex === currentImageIndex ? 1 : 0,
+                transition: 'opacity 0.6s ease-in-out, transform 0.5s ease-out',
+                zIndex: imgIndex === currentImageIndex ? 1 : 0
+              }}
+              onLoad={() => {
+                console.log(`Successfully loaded portfolio image: ${src}`);
+              }}
+              onError={(e) => {
+                console.warn(`Failed to load portfolio image: ${src}`);
+                const target = e.target as HTMLImageElement;
+                target.src = "/placeholder.svg";
+              }}
             />
-          )}
+          ))}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
         </div>
         <CardContent className="p-6 w-full">
@@ -777,33 +771,25 @@ I would love to discuss this project further with you.`
   return (
     <div
       className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 ${darkMode ? "dark bg-slate-900" : "bg-white"}`}
+      style={{ paddingTop: '80px' }}
     >
 
       {/* Navigation */}
-      <motion.nav
-        initial={{ y: -50 }}
-        animate={{ y: 0 }}
-        transition={{ 
-          duration: 0.2, 
-          ease: "easeOut"
-        }}
-        className="fixed top-0 left-0 right-0 w-full z-[9999] backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg transform-gpu"
+      <nav
+        className="fixed top-0 left-0 right-0 w-full z-[999999] backdrop-blur-md bg-white/95 dark:bg-slate-900/95 border-b border-blue-200/20 dark:border-blue-400/20 shadow-lg"
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 9999
+          zIndex: 999999,
+          transform: 'translate3d(0, 0, 0)',
+          willChange: 'auto'
         }}
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between w-full">
-            <motion.div 
-              whileHover={{ scale: 1.02 }} 
-              transition={{ 
-                duration: 0.2, 
-                ease: "easeOut"
-              }}
+            <div 
               className="flex items-center flex-shrink-0 space-x-3"
             >
               <Image
@@ -814,36 +800,22 @@ I would love to discuss this project further with you.`
                 className="h-10 sm:h-12 md:h-14 w-auto"
                 priority
               />
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  delay: 0.1, 
-                  duration: 0.3, 
-                  ease: "easeOut"
-                }}
+              <div
                 className="hidden sm:block"
               >
                 <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
                   Karel Interior Designs
                 </h1>
-              </motion.div>
+              </div>
               {/* Mobile version - shorter text */}
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  delay: 0.1, 
-                  duration: 0.3, 
-                  ease: "easeOut"
-                }}
+              <div
                 className="block sm:hidden"
               >
                 <h1 className="text-sm font-bold navbar-brand-text glow-pulse transform-gpu cursor-pointer">
                   Karel Interior Designs
                 </h1>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -889,18 +861,13 @@ I would love to discuss this project further with you.`
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ 
-                duration: 0.15, 
-                ease: [0.4, 0.0, 0.2, 1],
-                type: "spring",
-                stiffness: 500,
-                damping: 30
-              }}
+            <div
               className="md:hidden mt-4 pb-4 w-full"
+              style={{
+                opacity: mobileMenuOpen ? 1 : 0,
+                height: mobileMenuOpen ? 'auto' : 0,
+                transition: 'opacity 0.2s ease, height 0.2s ease'
+              }}
             >
               {["Home", "About", "Work", "Testimonials", "Contact"].map((item) => (
                 <button
@@ -911,10 +878,10 @@ I would love to discuss this project further with you.`
                   {item}
                 </button>
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Hero Section */}
       <section
@@ -923,26 +890,21 @@ I would love to discuss this project further with you.`
       >
         {/* Background Slideshow */}
         <div className="absolute inset-0 w-full h-full">
-          <AnimatePresence mode="wait">
           {heroImages.map((src, index) => (
-              <motion.div
+            <div
               key={src}
-                initial={{ opacity: 0 }}
-                animate={{ 
-                  opacity: index === (currentHeroIndex % heroImages.length) ? 1 : 0
-                }}
-                exit={{ opacity: 0 }}
-                transition={{ 
-                  duration: 0.6, 
-                  ease: "easeInOut"
-                }}
-                className="absolute inset-0 w-full h-full"
+              className="absolute inset-0 w-full h-full"
+              style={{
+                opacity: index === (currentHeroIndex % heroImages.length) ? 1 : 0,
+                transition: 'opacity 0.8s ease-in-out',
+                zIndex: index === (currentHeroIndex % heroImages.length) ? 1 : 0
+              }}
             >
               <Image
                 src={src || "/placeholder.svg"}
                 alt={`Hero Interior Design ${index + 1}`}
                 fill
-                className="object-cover w-full h-full transform-gpu"
+                className="object-cover w-full h-full"
                 priority={index === 0}
                 sizes="100vw"
                 loading={index === 0 ? "eager" : "lazy"}
@@ -953,14 +915,12 @@ I would love to discuss this project further with you.`
                 }}
                 onError={(e) => {
                   console.warn(`Failed to load hero image: ${src}`);
-                  // Fallback to placeholder
                   const target = e.target as HTMLImageElement;
                   target.src = "/placeholder.svg";
                 }}
               />
-              </motion.div>
+            </div>
           ))}
-          </AnimatePresence>
           {/* Preload next hero image to prevent blank moments */}
           <Image
             src={heroImages[(currentHeroIndex + 1) % heroImages.length] || "/placeholder.svg"}

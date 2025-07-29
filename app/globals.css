@@ -700,3 +700,137 @@ nav > div {
   position: relative !important;
   z-index: 1 !important;
 }
+
+/* Absolute navbar stickiness - never moves */
+nav,
+motion.nav,
+[class*="motion.nav"],
+[data-framer-name="nav"],
+header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  z-index: 999999 !important;
+  transform: translate3d(0, 0, 0) !important;
+  will-change: auto !important;
+  pointer-events: auto !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark nav,
+.dark motion.nav,
+.dark [class*="motion.nav"],
+.dark [data-framer-name="nav"],
+.dark header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.2) !important;
+}
+
+/* Override any motion transforms */
+nav * {
+  transform: none !important;
+}
+
+/* Ensure navbar container positioning */
+nav > div,
+nav .container {
+  position: relative !important;
+  z-index: 1 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Prevent any animations on navbar */
+nav,
+nav *,
+motion.nav,
+motion.nav * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Re-enable only necessary transitions */
+nav button,
+nav a {
+  transition: color 0.2s ease !important;
+}
+
+/* Ensure body has proper top margin for fixed navbar */
+body {
+  padding-top: 80px !important;
+}
+
+/* Ultimate performance optimizations for zero lag */
+* {
+  will-change: auto !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+}
+
+/* Optimize all transitions for maximum smoothness */
+* {
+  transition-timing-function: ease-out !important;
+  transition-duration: 0.2s !important;
+}
+
+/* Disable heavy animations on low-end devices */
+@media (max-width: 768px) {
+  .navbar-brand-text {
+    animation: none !important;
+    background: #06b6d4 !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    color: #06b6d4 !important;
+  }
+  
+  .glow-pulse {
+    animation: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Optimize image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  -ms-interpolation-mode: bicubic !important;
+  will-change: auto !important;
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Optimize GPU usage */
+.transform-gpu {
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+}
+
+/* Remove complex shadows and effects for performance */
+.glow-card-hover:hover {
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Simplify button animations */
+.glow-button {
+  transition: all 0.2s ease-out !important;
+}
+
+.glow-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+}
